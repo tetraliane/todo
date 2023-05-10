@@ -6,6 +6,9 @@ authors = ["Tetraliane <57061591+tetraliane@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
 
+[tool.poetry.scripts]
+todo = "todo.cli:main"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 PyYAML = "^6.0"
