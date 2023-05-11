@@ -96,3 +96,52 @@ def parse_date(date_str: str) -> datetime.date:
         return today + datetime.timedelta(days=diff)
 
     raise ValueError(f'"{date_str}" is not a valid format for date.')
+
+
+def parse_editor(text: str) -> tuple[str, str, str, str]:
+    title = ""
+    group = ""
+    due_date = ""
+    comment = ""
+
+    reading_header = True
+    for i, raw_line in enumerate(text.splitlines()):
+        line = raw_line.split("//")[0].strip()
+
+        if reading_header:
+            if raw_line.strip() == "" and title != "":
+                reading_header = False
+                continue
+            elif title == "":
+                title = line
+            elif line.startswith("#"):
+                group = line[1:].strip()
+            elif line.startswith("?"):
+                due_date = line[1:].strip()
+            else:
+                e = SyntaxError(
+                    'Expected "#", "?" or an empty line, but got `{}`'.format(raw_line)
+                )
+                e.filename = "<editor>"
+                e.lineno = i + 1
+                e.offset = 1
+                e.text = raw_line
+                e.end_lineno = i + 1
+                e.end_offset = len(raw_line)
+                raise e
+        else:
+            comment = comment + "\n" + line
+
+    if title == "":
+        e = SyntaxError("Title is not given.")
+        e.filename = "<editor>"
+        e.lineno = 1
+        e.offset = 1
+        e.text = text
+        e.end_lineno = len(text.splitlines()) if text != "" else 1
+        e.end_offset = len(text.splitlines()[-1]) if text != "" else 1
+        raise e
+
+    comment = comment.strip()  # removes empty line before and after the comment
+
+    return title, group, due_date, comment
