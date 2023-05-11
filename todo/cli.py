@@ -121,7 +121,9 @@ def edit(ctx: click.Context, id, interactive: bool):
     if interactive:
         title: str = click.prompt("title", default=item.title)
         group: str = click.prompt("group", default=item.group)
-        due_date: str = click.prompt("due date", default=item.date)
+        due_date: str = click.prompt(
+            "due date", default=item.due_date.isoformat() if item.due_date else ""
+        )
         comment = item.comment
     else:
         txt = click.edit(item.fmt_editor() + "\n" + EDITOR_HELP)
