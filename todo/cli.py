@@ -28,9 +28,6 @@ def main(ctx: click.Context):
 @main.command(help="List up TODOs.")
 @click.option("--date", "-d", help="Pick up TODOs for the date.")
 @click.option(
-    "status", "--completed", "-c", flag_value=True, help="Show completed TODOs."
-)
-@click.option(
     "-c",
     "--completed",
     "status",
