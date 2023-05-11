@@ -119,3 +119,97 @@ class TestDateParser(unittest.TestCase):
     def test_should_raise_value_error_for_invalid_format(self):
         with self.assertRaises(ValueError):
             parse_date("unknown date")
+
+
+class TestEditorParser(unittest.TestCase):
+    def test_should_pick_up_all_four_fields(self):
+        text = """
+        Sample ToDo
+        # sample/group
+        ? 3 days
+
+        This is the comment.
+        """
+
+        title, group, due_date, comment = parse_editor(text)
+        self.assertEqual(title, "Sample ToDo")
+        self.assertEqual(group, "sample/group")
+        self.assertEqual(due_date, "3 days")
+        self.assertEqual(comment, "This is the comment.")
+
+    def test_text_may_lack_comment(self):
+        text = """
+        Sample ToDo
+        # sample/group
+        ? 3 days
+        """
+
+        title, group, due_date, comment = parse_editor(text)
+        self.assertEqual(title, "Sample ToDo")
+        self.assertEqual(group, "sample/group")
+        self.assertEqual(due_date, "3 days")
+        self.assertEqual(comment, "")
+
+    def test_text_may_lack_group(self):
+        text = """
+        Sample ToDo
+        ? 3 days
+
+        This is the comment.
+        """
+
+        title, group, due_date, comment = parse_editor(text)
+        self.assertEqual(title, "Sample ToDo")
+        self.assertEqual(group, "")
+        self.assertEqual(due_date, "3 days")
+        self.assertEqual(comment, "This is the comment.")
+
+    def test_text_may_lack_due_date(self):
+        text = """
+        Sample ToDo
+        # sample/group
+
+        This is the comment.
+        """
+
+        title, group, due_date, comment = parse_editor(text)
+        self.assertEqual(title, "Sample ToDo")
+        self.assertEqual(group, "sample/group")
+        self.assertEqual(due_date, "")
+        self.assertEqual(comment, "This is the comment.")
+
+    def test_comment_may_be_very_long(self):
+        text = """
+        Sample ToDo
+
+        This is a very very very very long comment
+        that takes 2 lines.
+        """
+
+        _, _, _, comment = parse_editor(text)
+        self.assertEqual(
+            comment,
+            "This is a very very very very long comment\nthat takes 2 lines.",
+        )
+
+    def test_should_ignore_after_double_slash(self):
+        text = """
+        Sample ToDo
+
+        Before // after
+        """
+
+        title, group, due_date, comment = parse_editor(text)
+        self.assertEqual(title, "Sample ToDo")
+        self.assertEqual(group, "")
+        self.assertEqual(due_date, "")
+        self.assertEqual(comment, "Before")
+
+    def test_should_raise_syntax_error(self):
+        with self.assertRaises(SyntaxError):
+            parse_editor("")
+        with self.assertRaises(SyntaxError):
+            parse_editor("""
+            Sample ToDo
+            Comment without inserting a new line.
+            """)
