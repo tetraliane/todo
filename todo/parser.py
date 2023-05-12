@@ -84,6 +84,9 @@ def parse_date(date_str: str) -> datetime.date:
     elif re.match(r"^yesterday$", date_str, flags=re.IGNORECASE):
         # yesterday
         return datetime.date.today() - datetime.timedelta(days=1)
+    elif re.match(r"^today$", date_str, flags=re.IGNORECASE):
+        # today
+        return datetime.date.today()
     elif re.match(r"^tomorrow$", date_str, flags=re.IGNORECASE):
         # tomorrow
         return datetime.date.today() + datetime.timedelta(days=1)

@@ -71,6 +71,9 @@ class TestDateParser(unittest.TestCase):
     def test_should_accept_relative_date_keyword(self):
         today = datetime.date.today()
 
+        result = parse_date("today")
+        self.assertEqual(result, today)
+
         tomorrow = today + datetime.timedelta(days=1)
         result = parse_date("tomorrow")
         self.assertEqual(result, tomorrow)
